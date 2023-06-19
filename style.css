@@ -67,6 +67,16 @@ td {
   border-radius: 50px;
 }
 
+.available-move{
+  width: 15px;
+  height: 15px;
+  padding: 12px;
+  background-color: grey;
+  border: none;
+  border-radius: 50px;
+  pointer-events: none;
+}
+
 .king.red-piece {
   background-color: orange;
 }
@@ -176,4 +186,18 @@ span {
   .black-turn-text {
     font-size: 35px;
   }
+}
+
+.button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  margin: 0;  
+  cursor: pointer;
+  margin: 0 auto;
+  display: block;
 }
