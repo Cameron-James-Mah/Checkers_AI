@@ -241,7 +241,7 @@ function clickCell(e){ //Handles moving pieces
         //ai turn
         setTimeout(()=>{
             minimaxHelper()
-        }, 5)
+        }, 61)
         
         //console.log('AI turn')
     }
@@ -543,7 +543,7 @@ function minimaxHelper(){
     let bestValue = -2001
     let bestBoard = []
     let bestMove = [{}]
-    let depth = 8
+    let depth = 7
     //let board = [...board]
     if(canCapture(board, 'red')){
         //console.log(1)
