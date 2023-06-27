@@ -239,8 +239,11 @@ function clickCell(e){ //Handles moving pieces
     selectedPiece = null
     if(!playerTurn){
         //ai turn
-        minimaxHelper()
-        console.log('AI turn')
+        setTimeout(()=>{
+            minimaxHelper()
+        }, 5)
+        
+        //console.log('AI turn')
     }
     else{
         
@@ -435,17 +438,7 @@ function findPieceCord(pieceID, board){
     }
 }
 
-//Positive for AI, Negative for player
-/*Things I am considering:
-    - How many pieces ai/player has, bonus points for promoted piece
-    - How far up the board a piece is(how close to promoting) //make sure to check piece is not already promoted when checking this, i dont care how far up the board a promoted piece is
-    First eval: 
-        +1 for each row up the board a piece is 
-        +4 for each non promoted piece
-        +10 for each promoted piece
-    Thoughts: Maybe a piece moving to lets say the second last rank(close to promote) should be weighed more than a piece moving to the second rank(further to promote)
-z
-*/
+
 
 //ONLY USING IN MINIMAX, WILL INCLUDE FOLLOWUP CAPTURES
 function getPlayerMoves(board, player){ //use this function to check if player or ai is lost, also in minimax helper for iterating over possible moves 
@@ -550,7 +543,7 @@ function minimaxHelper(){
     let bestValue = -2001
     let bestBoard = []
     let bestMove = [{}]
-    let depth = 7
+    let depth = 8
     //let board = [...board]
     if(canCapture(board, 'red')){
         //console.log(1)
@@ -576,7 +569,7 @@ function minimaxHelper(){
                         followUp = true
                     }
                     if(!followUp){ //Don't count incomplete possible multi jumps
-                        let temp = minimax(curr, false, 6, -1000, 1000, null)
+                        let temp = minimax(curr, false, depth, -1000, 1000, null)
                         if(temp > bestValue){
                             bestBoard = [...curr]
                             bestValue = temp
@@ -602,7 +595,7 @@ function minimaxHelper(){
             }
         } 
     }
-    console.log(bestValue)
+    
     board = bestBoard
     if(bestMove.y == 7){
         promoted.add(board[bestMove.y][bestMove.x])
@@ -611,6 +604,7 @@ function minimaxHelper(){
     resetSelected()
     removeEventListeners()
     setEventListeners()
+    console.log(evalBoard(board))
     playerTurn = true
     //check if ai won after making optimal move
     //console.log(pieces)
@@ -770,11 +764,25 @@ function checkWin(board, player){ //returns true if specified player is winning 
     }
 }
 
+//Positive for AI, Negative for player
+/*Things I am considering:
+    - How many pieces ai/player has, bonus points for promoted piece
+    - How far up the board a piece is(how close to promoting) //make sure to check piece is not already promoted when checking this, i dont care how far up the board a promoted piece is
+    First eval: 
+        +1 for each row up the board a piece is 
+        +4 for each non promoted piece
+        +10 for each promoted piece
+    Thoughts: Maybe a piece moving to lets say the second last rank(close to promote) should be weighed more than a piece moving to the second rank(further to promote)
+z
+*/
+//MAYBE MULTIPLY THE BONUS FOR HOW FAR  PIECE IS UP THE BOARD BY 2 TO ENCOURAGE MOVING PIECES THAT ARE FURTHER UP THE BOARD
+
+
 function evalBoard(board){
     let aiEval = 0
     let playerEval = 0
     let pieceWeight = 4
-    let promotedWeight = 10
+    let promotedWeight = 13
     for(let i = 0; i < board.length; i++){
         for(let j = 0; j < board[0].length; j++){
             if(board[i][j] == -1){
