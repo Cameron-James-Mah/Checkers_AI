@@ -2,18 +2,11 @@
   margin: auto;
 }
 
-main {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  height: 100vh;
+h1 {
+  font-size: 45px;
 }
 
-div {
-  display: flex;
-  justify-content: space-between;
-}
+
 
 .mobile {
   display: none;
@@ -35,23 +28,10 @@ td {
   height: 65px;
 }
 
-.red-turn-text {
-  text-align: center;
-  color: black;
-  font-family: "open sans";
-  font-size: 55px;
-}
-
-.black-turn-text {
-  text-align: center;
-  font-family: "open sans";
-  font-size: 55px;
-  color: lightgray;
-}
 
 .black-piece {
-  width: 20px;
-  height: 20px;
+  width: 40px;
+  height: 40px;
   padding: 12px;
   background-color: black;
   border: none;
@@ -59,8 +39,8 @@ td {
 }
 
 .red-piece {
-  width: 20px;
-  height: 20px;
+  width: 40px;
+  height: 40px;
   padding: 12px;
   background-color: red;
   border: none;
@@ -68,8 +48,8 @@ td {
 }
 
 .available-move{
-  width: 15px;
-  height: 15px;
+  width: 25px;
+  height: 25px;
   padding: 12px;
   background-color: grey;
   border: none;
@@ -135,13 +115,7 @@ span {
     display: none;
   }
 
-  .red-turn-text {
-    -webkit-transform: rotate(-180deg);
-    -moz-transform: rotate(-180deg);
-    -o-transform: rotate(-180deg);
-    transform: rotate(-180deg);
-    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2);
-  }
+  
 }
 
 @media screen and (max-width: 380px) {
@@ -188,16 +162,69 @@ span {
   }
 }
 
-.button {
-  background-color: #4CAF50;
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  font-size: 16px;
-  margin: 0;  
-  cursor: pointer;
-  margin: 0 auto;
-  display: block;
+
+
+body {
+  font-family: -apple-system, ".SFNSText-Regular", "Helvetica Neue", "Roboto", "Segoe UI", sans-serif;
 }
+
+
+.talk-bubble {
+  display: inline-block;
+  position: relative;
+  width: 200px;
+  height: auto;
+  background-color: rgb(224, 249, 255);
+}
+
+.tri-right.border.left-in:before {
+  content: ' ';
+  position: absolute;
+  width: 0;
+  height: 0;
+  left: -40px;
+  right: auto;
+  top: 30px;
+  bottom: auto;
+  border: 20px solid;
+  border-color: #666 #666 transparent transparent;
+}
+
+.tri-right.left-in:after {
+  content: ' ';
+  position: absolute;
+  width: 0;
+  height: 0;
+  left: -20px;
+  right: auto;
+  top: 38px;
+  bottom: auto;
+  border: 12px solid;
+  border-color: rgb(224, 249, 255) rgb(224, 249, 255) transparent transparent;
+}
+
+.talktext {
+  padding: 1em;
+  text-align: left;
+  line-height: 1.5em;
+}
+
+.talktext p {
+  /* remove webkit p margins */
+  -webkit-margin-before: 0em;
+  -webkit-margin-after: 0em;
+}
+
+ #main {
+   text-align: center;
+   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+ }
+
+
+
+
+ *,
+ *:before,
+ *:after {
+   box-sizing: border-box;
+ }
