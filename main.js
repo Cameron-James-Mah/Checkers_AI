@@ -26,6 +26,7 @@ console.log(redPieces)*/
 //numbers are document id's
 
 //standard setup
+
 let board = [
     [-1, 100, -1, 101, -1, 102, -1, 103],
     [104, -1, 105, -1, 106, -1, 107, -1],
@@ -48,8 +49,9 @@ let board = [
     [-1, 116, -1, 117, -1, 118, -1, 119],
     [120, -1, 121, -1, 122, -1, 123, -1]
 ]*/
-/*
+
 //check red capture forwards, black capture properly normal and promoted
+/*
 let board = [
     [-1, -1, -1, -1, -1, -1, -1, -1],
     [-1, -1, 103, -1, 100, -1, -1, -1],
@@ -58,7 +60,7 @@ let board = [
     [-1, -1, -1, -1, -1, -1, -1, -1],
     [-1, -1, -1, -1, 112, -1, -1, -1],
     [-1, 116, -1, 117, -1, 118, -1, 119],
-    [120, -1, 121, -1, 122, -1, 123, -1]
+    [120, -1, 121, -1, 122, -1, -1, -1]
 ]*/
 /*
 //blank
@@ -476,6 +478,46 @@ function getPlayerMoves(board, player){ //use this function to check if player o
 /*
     CHECKERS BOT FUNCTIONS BELOW
 */
+//assume ai is red
+//need to return new position and captured piece position
+function getFollowUpAI(board, i, j, player){
+    let res = []
+    if(player == 'red'){
+        if(j < board[0].length-2 && i < board.length-2 && board[i+1][j+1] >= 112 && board[i+2][j+2] == -1){
+            res.push({x: j+2, y: i+2, captured: {x: j+1, y: i+1}})
+        }
+        if(j > 1 && i < board.length-2 && board[i+1][j-1] >= 112 && board[i+2][j-2] == -1){
+            res.push({x: j-2, y: i+2, captured: {x: j-1, y: i+1}})
+        }
+        if(promoted.has(board[i][j])){
+            if(j < board[0].length-2 && i > 1 && board[i-1][j+1] >= 112 && board[i-2][j+2] == -1){
+                res.push({x: j+2, y: i-2, captured: {x: j+1, y: i-1}})
+            }
+            if(j > 1 && i > 1 && board[i-1][j-1] >= 112  && board[i-2][j-2] == -1){
+                res.push({x: j-2, y: i-2, captured: {x: j-1, y: i-1}})
+            }
+        }
+    }
+    else if(player == 'black'){
+        if(j < board[0].length-2 && i > 1 && board[i-1][j+1] >= 100 && board[i-1][j+1] <= 111  && board[i-2][j+2] == -1){
+            res.push({x: j+2, y: i-2, captured: {x: j+1, y: i-1}})
+        }
+        if(j > 1 && i > 1 && board[i-1][j-1] >= 100 && board[i-1][j-1] <= 111  && board[i-2][j-2] == -1){
+            res.push({x: j-2, y: i-2, captured: {x: j-1, y: i-1}})
+        }
+        //if promoted
+        if(promoted.has(board[i][j])){
+            if(j < board[0].length-2 && i < board.length-2 && board[i+1][j+1] >= 100 && board[i+1][j+1] <= 111 && board[i+2][j+2] == -1){
+                res.push({x: j+2, y: i+2, captured: {x: j+1, y: i+1}})
+            }
+            if(j > 1 && i < board.length-2 && board[i+1][j-1] >= 100 && board[i+1][j-1] <= 111 && board[i+2][j-2] == -1){
+                res.push({x: j-2, y: i+2, captured: {x: j-1, y: i+1}})
+            }
+        }
+    }
+    
+    return res
+}
 
 function updateBoard(board, startY, startX, endY, endX, captured){ //used in minimax(AND ONLY minimax), update a given board based on a move
     let temp = []
@@ -509,22 +551,37 @@ function minimaxHelper(){
     let bestBoard = []
     let bestMove = [{}]
     let depth = 7
+    //let board = [...board]
     if(canCapture(board, 'red')){
         //console.log(1)
         for(let piece of pieces){
             //piece structure: {y: int, x: int, moves: [{y: int, x: int, captured: y: ,x: OR null}]} 
             for(let move of piece.moves){
+                let followUp = false
                 //console.log(updateBoard(board, piece.y, piece.x, move.y, move.x, move.captured))
                 if(move.captured){
                     //might have to make new struct push only the capture move with original square too
                     //actually maybe do minimax call here pass whatever params i need
                     //console.log(piece)
-                    let curr = updateBoard(board, piece.y, piece.x, move.y, move.x, move.captured)
-                    let temp = minimax(curr, false, 6, -1000, 1000)
-                    if(temp > bestValue){
-                        bestBoard = [...curr]
-                        bestValue = temp
-                        bestMove = move
+                    let curr = null
+                    if(piece.board){
+                        curr = updateBoard(piece.board, piece.y, piece.x, move.y, move.x, move.captured)
+                    }
+                    else{
+                        curr = updateBoard(board, piece.y, piece.x, move.y, move.x, move.captured)
+                    }
+                    let additionalJumps = getFollowUpAI(curr, move.y, move.x, 'red') //follow up jumps
+                    for(let jump of additionalJumps){ //add follow up jumps\
+                        pieces.push({board: curr, y: move.y, x: move.x, moves: [{y: jump.y, x: jump.x, captured: jump.captured}]})
+                        followUp = true
+                    }
+                    if(!followUp){ //Don't count incomplete possible multi jumps
+                        let temp = minimax(curr, false, 6, -1000, 1000, null)
+                        if(temp > bestValue){
+                            bestBoard = [...curr]
+                            bestValue = temp
+                            bestMove = move
+                        }
                     }
                 }
             }
@@ -584,14 +641,29 @@ function minimax(board, maximizing, depth, alpha, beta){
             for(let piece of pieces){
                 //piece structure: {y: int, x: int, moves: [{y: int, x: int, captured: y: ,x: OR null}]} 
                 for(let move of piece.moves){
+                    let followUp = false
                     if(move.captured){
-                        let curr = updateBoard(board, piece.y, piece.x, move.y, move.x, move.captured)
-                        let temp = minimax(curr, false, depth-1, alpha, beta)
-                        value = Math.max(value, temp)
-                        alpha = Math.max(alpha, temp)
-                        if(beta <= alpha){
-                            break
+                        let curr = null
+                        if(piece.board){
+                            curr = updateBoard(piece.board, piece.y, piece.x, move.y, move.x, move.captured)
                         }
+                        else{
+                            curr = updateBoard(board, piece.y, piece.x, move.y, move.x, move.captured)
+                        }
+                        let temp = minimax(curr, false, depth-1, alpha, beta)
+                        let additionalJumps = getFollowUpAI(curr, move.y, move.x, 'red')
+                        for(let jump of additionalJumps){
+                            pieces.push({board: curr, y: move.y, x: move.x, moves: [{y: jump.y, x: jump.x, captured: jump.captured}]})
+                            followUp = true
+                        }
+                        if(!followUp){
+                            value = Math.max(value, temp)
+                            alpha = Math.max(alpha, temp)
+                            if(beta <= alpha){
+                                break
+                            }
+                        }
+                        
                     }
                 }
             } 
@@ -628,14 +700,30 @@ function minimax(board, maximizing, depth, alpha, beta){
             for(let piece of pieces){
                 //piece structure: {y: int, x: int, moves: [{y: int, x: int, captured: y: ,x: OR null}]} 
                 for(let move of piece.moves){
+                    let followUp = false
                     if(move.captured){
-                       let curr = updateBoard(board, piece.y, piece.x, move.y, move.x, move.captured)
-                        let temp = minimax(curr, true, depth-1, alpha, beta)
-                        value = Math.min(value, temp)
-                        beta = Math.min(beta, temp)
-                        if(beta <= alpha){
-                            break
+                        let curr = null
+                        if(piece.board){
+                            curr = updateBoard(piece.board, piece.y, piece.x, move.y, move.x, move.captured)
                         }
+                        else{
+                            curr = updateBoard(board, piece.y, piece.x, move.y, move.x, move.captured)
+                        }
+                       
+                        let temp = minimax(curr, true, depth-1, alpha, beta)
+                        let additionalJumps = getFollowUpAI(curr, move.y, move.x, 'black')
+                        for(let jump of additionalJumps){
+                            pieces.push({board: curr, y: move.y, x: move.x, moves: [{y: jump.y, x: jump.x, captured: jump.captured}]})
+                            followUp = true
+                        }
+                        if(!followUp){
+                            value = Math.min(value, temp)
+                            beta = Math.min(beta, temp)
+                            if(beta <= alpha){
+                                break
+                            }
+                        }
+                        
                     }
                 }
             } 
