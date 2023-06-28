@@ -228,3 +228,7 @@ body {
  *:after {
    box-sizing: border-box;
  }
+
+.depth{
+  font-size: 15px;
+}

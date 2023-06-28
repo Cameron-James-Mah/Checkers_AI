@@ -18,7 +18,15 @@
           <p id="roboText">Lets see if you can beat me!</p>
         </div>
       </div>
-      <br><br>
+      <br/>
+      <div class = 'depthSel'>
+      <label for="depth">Depth:</label>
+      <select class = 'depth' name="depth" id="depth" onchange="changedDepth()">
+        <option value="8">8</option>
+        <option value="6">6</option>
+      </select>
+      </div>
+      <br /><br />
     <table>
       <tr>
         <td id = "00" class="noPieceHere"></td>
@@ -125,7 +133,7 @@
     </table>
     <br/>
     <p>Rules: <a href="https://www.officialgamerules.org/checkers" target="_blank">https://www.officialgamerules.org/checkers</a></p>
-
+    
     
 
     
