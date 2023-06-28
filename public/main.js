@@ -184,6 +184,15 @@ function resetSelected(){
     }
 }
 
+function changedDepth(){
+    if(document.getElementById('depth').value == 8){
+        document.getElementById('roboText').innerHTML = 'I feel smarter now!'
+    }
+    else if(document.getElementById('depth').value == 6){
+        document.getElementById('roboText').innerHTML = 'I feel dumber now!'
+    }
+}
+
 function clickCell(e){ //Handles moving pieces
     //NEED TO ALSO CHECK IF MOVE IS VALID
     if(!selectedPiece || !playerTurn){
@@ -238,7 +247,7 @@ function clickCell(e){ //Handles moving pieces
     removeEventListeners()
     setEventListeners()
     selectedPiece = null
-    document.getElementById('roboText').innerHTML = `Computing...`
+    document.getElementById('roboText').innerHTML = `Computing... Am i taking too long? Try reducing my depth`
     if(!playerTurn){
         //ai turn
         setTimeout(()=>{
@@ -545,7 +554,8 @@ function minimaxHelper(){
     let bestValue = -2001
     let bestBoard = []
     let bestMove = [{}]
-    let depth = 7
+    //let depth = 8
+    let depth = parseInt(document.getElementById('depth').value)
     perms = 0
     //let board = [...board]
     if(canCapture(board, 'red')){
@@ -656,7 +666,7 @@ function minimax(board, maximizing, depth, alpha, beta){
         }*/
         let value = -1000
         let pieces = getPlayerMoves(board, 'red')
-        if(!pieces){
+        if(pieces.length == 0){
             return -1000
         }
         if(canCapture(board, 'red')){
@@ -715,7 +725,7 @@ function minimax(board, maximizing, depth, alpha, beta){
         }*/
         let value = 1000
         let pieces = getPlayerMoves(board, 'black')
-        if(!pieces){
+        if(pieces.length == 0){
             return 1000
         }
         if(canCapture(board, 'black')){
