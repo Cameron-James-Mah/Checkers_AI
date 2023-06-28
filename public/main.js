@@ -622,16 +622,16 @@ function minimaxHelper(){
             document.getElementById('roboText').innerHTML += ` and we are evenly matched!`
         }
         else if(ev > 10){
-            document.getElementById('roboText').innerHTML += `and I am winning!`
+            document.getElementById('roboText').innerHTML += ` and I am winning!`
         }
         else if(ev > 30){
-            document.getElementById('roboText').innerHTML += `and I am dominating!`
+            document.getElementById('roboText').innerHTML += ` and I am dominating!`
         }
         else if(ev < -10){
-            document.getElementById('roboText').innerHTML += `and I am losing!`
+            document.getElementById('roboText').innerHTML += ` and I am losing!`
         }
         else if(ev < -30){
-            document.getElementById('roboText').innerHTML += `and I am failing!`
+            document.getElementById('roboText').innerHTML += ` and I am failing!`
         }
     }
     //check if ai won after making optimal move
@@ -645,10 +645,10 @@ function minimaxHelper(){
 //evaluate wins as 1000/-1000
 //make sure im passing the updated board
 function minimax(board, maximizing, depth, alpha, beta){
+    perms++
     if(depth == 0){
         return evalBoard(board)
     }
-    perms++
     if(maximizing){
         /*
         if(checkWin(board, 'black')){ //player won before this node
