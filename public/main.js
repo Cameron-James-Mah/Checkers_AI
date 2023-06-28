@@ -7,6 +7,7 @@ let promoted = new Set() //set to store ids of promoted pieces
 let selectedPiece = null
 let playerTurn = true
 let followUpPiece = null
+let perms = 0
 
 
 document.addEventListener('keydown', function(event) {
@@ -86,8 +87,8 @@ let board = [
     [-1, -1, -1, -1, -1, -1, -1, -1],
     [120, -1, 100, -1, -1, -1, -1, -1]
 ]
-promoted.add(100)*/
-
+promoted.add(100)
+*/
 /*
 //Test double jump
 let board = [
@@ -237,6 +238,7 @@ function clickCell(e){ //Handles moving pieces
     removeEventListeners()
     setEventListeners()
     selectedPiece = null
+    document.getElementById('roboText').innerHTML = `Computing...`
     if(!playerTurn){
         //ai turn
         setTimeout(()=>{
@@ -544,6 +546,7 @@ function minimaxHelper(){
     let bestBoard = []
     let bestMove = [{}]
     let depth = 7
+    perms = 0
     //let board = [...board]
     if(canCapture(board, 'red')){
         //console.log(1)
@@ -604,8 +607,33 @@ function minimaxHelper(){
     resetSelected()
     removeEventListeners()
     setEventListeners()
-    console.log(evalBoard(board))
+    //console.log(evalBoard(board))
     playerTurn = true
+    let check = getPlayerMoves(board, 'black') 
+    if(check.length == 0){ //AI Won
+        alert("AI Won")
+        document.getElementById('roboText').innerHTML = 'Good Game!'
+        playerTurn = false
+    }
+    else{
+        document.getElementById('roboText').innerHTML = `I have analyzed ${perms} positions`
+        let ev = evalBoard(board)
+        if(Math.abs(ev) < 10){
+            document.getElementById('roboText').innerHTML += ` and we are evenly matched!`
+        }
+        else if(ev > 10){
+            document.getElementById('roboText').innerHTML += `and I am winning!`
+        }
+        else if(ev > 30){
+            document.getElementById('roboText').innerHTML += `and I am dominating!`
+        }
+        else if(ev < -10){
+            document.getElementById('roboText').innerHTML += `and I am losing!`
+        }
+        else if(ev < -30){
+            document.getElementById('roboText').innerHTML += `and I am failing!`
+        }
+    }
     //check if ai won after making optimal move
     //console.log(pieces)
 }
@@ -620,6 +648,7 @@ function minimax(board, maximizing, depth, alpha, beta){
     if(depth == 0){
         return evalBoard(board)
     }
+    perms++
     if(maximizing){
         /*
         if(checkWin(board, 'black')){ //player won before this node
