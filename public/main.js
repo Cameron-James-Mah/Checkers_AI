@@ -101,7 +101,45 @@ let board = [
     [-1, -1, -1, 115, -1, -1, -1, -1],
     [-1, -1, -1, -1, -1, -1, -1, -1]
 ]*/
-
+/*
+//Test player can win
+let board = [
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [100, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [119, -1, 120, -1, -1, -1, -1, -1]
+]
+promoted.add(120)
+*/
+/*
+//Check enemy win
+let board = [
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, 105, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, 101, -1, -1],
+    [-1, -1, -1, -1, -1, -1, 100, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, 120, -1]
+]*/
+/*
+//Test ai endgame
+let board = [
+    [-1, 120, -1, 119, -1, 118, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, 100, -1, 101, -1, 102, -1]
+]
+promoted.add(120).add(119).add(118).add(100).add(101).add(102)*/
 
 //Convinient board init, no need to change board[[]] to match html values. Saves time/error when testing
 /*
@@ -185,10 +223,10 @@ function resetSelected(){
 }
 
 function changedDepth(){
-    if(document.getElementById('depth').value == 8){
+    if(document.getElementById('depth').value == 9){
         document.getElementById('roboText').innerHTML = 'I feel smarter now!'
     }
-    else if(document.getElementById('depth').value == 6){
+    else if(document.getElementById('depth').value == 7){
         document.getElementById('roboText').innerHTML = 'I feel dumber now!'
     }
 }
@@ -247,7 +285,6 @@ function clickCell(e){ //Handles moving pieces
     removeEventListeners()
     setEventListeners()
     selectedPiece = null
-    document.getElementById('roboText').innerHTML = `Computing... Am i taking too long? Try reducing my depth`
     if(!playerTurn){
         //ai turn
         setTimeout(()=>{
@@ -462,7 +499,10 @@ function getPlayerMoves(board, player){ //use this function to check if player o
                     x: j,
                     moves: getValidMoves({y: i, x: j, id: board[i][j]}, board,'black')
                 }
-                moves.push(move)
+                if(move.moves.length > 0){
+                    moves.push(move)
+                }
+                
             }
             else if(player == 'red' && board[i][j] != -1 && board[i][j] < 112){
                 let move = {
@@ -470,7 +510,9 @@ function getPlayerMoves(board, player){ //use this function to check if player o
                     x: j,
                     moves: getValidMoves({y: i, x: j, id: board[i][j]}, board,'red')
                 }
-                moves.push(move)
+                if(move.moves.length > 0){
+                    moves.push(move)
+                }
             }
         }
     }
@@ -550,7 +592,13 @@ function updateBoard(board, startY, startX, endY, endX, captured){ //used in min
 
 
 function minimaxHelper(){
+    document.getElementById('roboText').innerHTML = `Computing... Am i taking too long? Try reducing my depth`
     let pieces = getPlayerMoves(board, 'red')
+    if(pieces.length == 0){
+        alert("Player Won")
+        document.getElementById('roboText').innerHTML = 'Good Game!'
+        playerTurn = false
+    }
     let bestValue = -2001
     let bestBoard = []
     let bestMove = [{}]
@@ -613,6 +661,7 @@ function minimaxHelper(){
     if(bestMove.y == 7){
         promoted.add(board[bestMove.y][bestMove.x])
     }
+    
     updateHTML()
     resetSelected()
     removeEventListeners()
@@ -624,6 +673,12 @@ function minimaxHelper(){
         alert("AI Won")
         document.getElementById('roboText').innerHTML = 'Good Game!'
         playerTurn = false
+    }
+    else if(bestValue <= -1000){ //calculated loss for ai with best play
+        document.getElementById('roboText').innerHTML = 'I have a bad feeling about this...'
+    }
+    else if(bestValue >= 1000){ //calculated win for ai with best play
+        document.getElementById('roboText').innerHTML = 'I have a good feeling about this one!'
     }
     else{
         document.getElementById('roboText').innerHTML = `I have analyzed ${perms} positions`
@@ -815,6 +870,13 @@ function checkWin(board, player){ //returns true if specified player is winning 
 z
 */
 //MAYBE MULTIPLY THE BONUS FOR HOW FAR  PIECE IS UP THE BOARD BY 2 TO ENCOURAGE MOVING PIECES THAT ARE FURTHER UP THE BOARD
+/*
+    Issue: 
+    AI suffers in endgame(most pieces promoted) due to not being able to see far enough to see tactics when no player pieces near
+    Possible fix:
+    Adding a small amount of value to having promoted piece closer to the middle of the board, maybe like some decimal value so as
+    to not affect early/mid game. This will encourage the ai to move closer to player pieces(in endgame) and hopefully be in range for tactics 
+*/
 
 
 function evalBoard(board){
@@ -822,6 +884,7 @@ function evalBoard(board){
     let playerEval = 0
     let pieceWeight = 4
     let promotedWeight = 13
+    let middleWeight = 0.01 //make promoted pieces have a very slight inclination to go to the middle, only affects endgame
     for(let i = 0; i < board.length; i++){
         for(let j = 0; j < board[0].length; j++){
             if(board[i][j] == -1){
@@ -830,6 +893,24 @@ function evalBoard(board){
             else if(board[i][j] < 112){ //red piece, player
                 if(promoted.has(board[i][j])){ //promoted red piece
                     aiEval += promotedWeight
+                    if(i < 3){
+                        aiEval += i * middleWeight
+                    }
+                    else if(i > 4){
+                        aiEval += (7-i) * middleWeight
+                    }
+                    else{
+                        aiEval += middleWeight * 3
+                    }
+                    if(j < 3){
+                        aiEval += j * middleWeight
+                    }
+                    else if(j > 4){
+                        aiEval += (7-j) * middleWeight
+                    }
+                    else{
+                        aiEval += middleWeight * 3
+                    }
                 }
                 else{ //normal red piece
                     aiEval += i
@@ -839,6 +920,24 @@ function evalBoard(board){
             else if(board[i][j] >= 112){ //black piece, ai
                 if(promoted.has(board[i][j])){ //promoted black piece
                     playerEval += promotedWeight
+                    if(i < 3){
+                        playerEval += i * middleWeight
+                    }
+                    else if(i > 4){
+                        playerEval += (7-i) * middleWeight
+                    }
+                    else{
+                        playerEval += middleWeight * 3
+                    }
+                    if(j < 3){
+                        playerEval += j * middleWeight
+                    }
+                    else if(j > 4){
+                        playerEval += (7-j) * middleWeight
+                    }
+                    else{
+                        playerEval += middleWeight * 3
+                    }
                 }
                 else{ //normal black piece
                     playerEval += 7-i
