@@ -141,6 +141,7 @@ let board = [
 ]
 promoted.add(120).add(119).add(118).add(100).add(101).add(102)*/
 
+
 //Convinient board init, no need to change board[[]] to match html values. Saves time/error when testing
 /*
 let currRed = 100
@@ -287,6 +288,7 @@ function clickCell(e){ //Handles moving pieces
     selectedPiece = null
     if(!playerTurn){
         //ai turn
+        document.getElementById('roboText').innerHTML = `Computing... Am i taking too long? Try reducing my depth`
         setTimeout(()=>{
             minimaxHelper()
         }, 61)
@@ -592,7 +594,6 @@ function updateBoard(board, startY, startX, endY, endX, captured){ //used in min
 
 
 function minimaxHelper(){
-    document.getElementById('roboText').innerHTML = `Computing... Am i taking too long? Try reducing my depth`
     let pieces = getPlayerMoves(board, 'red')
     if(pieces.length == 0){
         alert("Player Won")
